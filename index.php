@@ -6,9 +6,9 @@ error_reporting(E_ALL);
 
 // Conect system files:
 define('ROOT', dirname(__FILE__));
-define('DIRSEP', DIRECTORY_SEPARATOR);
+define('DS', DIRECTORY_SEPARATOR);
 
-require_once ROOT.DIRSEP.'Volpi.php';
+require_once ROOT.DS.'Volpi.php';
 
 $template = new Volpi();
 
@@ -18,4 +18,4 @@ $template['Volpi'] = 'my template engine Volpi!!';
 
 $template['array'] = array('This', 'is', 'an', 'Array', '!');
 
-$template->show('templates/index.tpl');
+$template->show('index');

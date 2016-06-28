@@ -1,2 +1,2 @@
-# volpi
+# Volpi
 Simple template engine

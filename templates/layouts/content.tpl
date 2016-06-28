@@ -1,7 +1,7 @@
-{ hello } { myname } and this is { Volpi }
+{{ hello }} {{ myname }} and this is {{ Volpi }}
 <br>
-{ %foreach array %as row }
+{{ foreach array as row }}
 
-    { row }
+   {{ row }}
     
-{ %endforeach }
+{{ endforeach }}

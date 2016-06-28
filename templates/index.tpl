@@ -1,11 +1,13 @@
-{ include('templates/layouts/header.tpl') }
+{{ include('layouts.header') }}
 
 <div class="container">
     <div class="jumbotron">
         <center>
-{ include('templates/layouts/content.tpl') }
+            
+{{ include('layouts.content') }}
+
         </center>
     </div>  
 </div>
 
-{ include('templates/layouts/footer.tpl') }
+{{ include('layouts.footer') }}

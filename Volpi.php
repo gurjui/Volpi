@@ -1,5 +1,7 @@
 <?php
 
+define('TPL_ROOT', ROOT.'/templates');
+
 class Volpi implements ArrayAccess
 {
     private $template_vars = array();
@@ -28,40 +30,49 @@ class Volpi implements ArrayAccess
     {
         return isset($this->template_vars[$offset]) ? $this->template_vars[$offset] : null;
     }
+    
+    public static function getPath($path)
+    {   
+        $tpl_path = str_replace('.', DS, $path);
+        $extention = '.tpl';
+        return TPL_ROOT.DS.$tpl_path.$extention;
+    }
      
-    public function insertSections()
+    private function insertSections()
     {
-        $pattern = '~{\s*include\(\'(.*)\'\)\s*}~';
+        $pattern = '~{{\s*include\(\'(.+?)\'\)\s*}}~';
         function getSection($matches)
         {
-            return file_get_contents(array_pop($matches));
+            $path = array_pop($matches);
+            $file_path =  Volpi::getPath($path);
+            return file_get_contents($file_path);
         }
         $this->content = preg_replace_callback($pattern, "getSection", $this->content);
     }
     
-    public function insertVars()
+    private function insertVars()
     {
         foreach ($this->template_vars as $key => $variable)
         {
             if(!is_array($variable))
             {
-                $pattern = '/{\s*'.$key.'\s*}/';
+                $pattern = '/{{\s*'.$key.'\s*}}/';
                 $replacement = "<?php echo \"{$variable}\"; ?>";
                 $this->content = preg_replace($pattern, $replacement, $this->content);
             }
         }
     }
     
-    public function insertCycles()
+    private function insertCycles()
     {   
         $patterns = array(
-            '/{\s*%foreach\s*([A-Za-z]+)\s*%as\s*([A-Za-z]+)\s*}/' =>
+            '/{{\s*foreach\s*(.+?)\s*as\s*(.+?)\s*}}/' =>
             '<?php foreach( $this->template_vars[\'$1\'] as $$2): ?>',
             
-            '/{\s*%endforeach\s*}/' =>
+            '/{{\s*endforeach\s*}}/' =>
             '<?php endforeach; ?>',
-            
-            '/{\s*(.*)\s*}/' =>
+        
+            '/{{\s*(.+?)\s*}}/' =>
             '<?php echo $$1; ?>',
         );
         foreach($patterns as $pattern => $replacement)
@@ -70,7 +81,7 @@ class Volpi implements ArrayAccess
         }
     }
     
-    public function compile($template)
+    private function compile($template)
     {
         $this->content = file_get_contents($template);
         $this->insertSections();
@@ -80,7 +91,8 @@ class Volpi implements ArrayAccess
     
     public function show($template)
     {
-        $this->compile($template);
-        eval('?>'.$this->content.'<?');
+        $tpl_path = self::getPath($template);
+        $this->compile($tpl_path);
+        eval('?>'.$this->content);
     }
 }
